@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, bookingBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, bookingBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',        icon:'◉', path:'/provider/dashboard', active:true },
@@ -62,7 +62,7 @@ export default function ProviderDashboard() {
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name} ${user?.last_name}`} userRole="Service Provider"
         extra={<div style={{ marginTop:5 }}><span style={s.badge(availBadge)}>{provider?.availability_status ? '● Available' : '● Busy'}</span></div>} />
-      <main style={s.main}>
+      <PageLayout>
 
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>Dashboard</h1>
@@ -81,7 +81,7 @@ export default function ProviderDashboard() {
         </div>
 
         {/* Stats */}
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[
             { label:'Services Offered', value:stats.services,     color:T.ink },
             { label:'Upcoming Jobs',    value:stats.upcoming,     color:T.blue },
@@ -157,7 +157,7 @@ export default function ProviderDashboard() {
             </div>
           ))}
         </div>
-      </main>
+      </PageLayout>
     </div>
   )
 }
