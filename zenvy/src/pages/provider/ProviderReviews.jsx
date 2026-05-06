@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',        icon:'◉', path:'/provider/dashboard' },
@@ -43,7 +43,7 @@ export default function ProviderReviews() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||""} ${user?.last_name||""}`} userRole="Service Provider" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>My Reviews</h1><p style={s.sub}>Feedback from customers about your services</p>
         </div>
@@ -70,7 +70,7 @@ export default function ProviderReviews() {
           </div>
         </div>
 
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[{label:'Total Reviews',value:counts.all,color:T.ink},{label:'5 Star',value:counts[5],color:'#d97706'},{label:'4 Star',value:counts[4],color:'#f59e0b'},{label:'1–3 Star',value:counts[3]+counts[2]+counts[1],color:T.terra}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -116,7 +116,7 @@ export default function ProviderReviews() {
             })}
           </div>
         )}
-      </main>
+      </PageLayout>
     </div>
   )
 }
