@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, paymentBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, paymentBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard', icon:'◉', path:'/admin/dashboard' },
@@ -58,12 +58,12 @@ export default function AdminPayments() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${adminUser?.first_name||""} ${adminUser?.last_name||""}`} userRole="Super Admin" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>Payment Management</h1><p style={s.sub}>Monitor all platform transactions</p>
         </div>
 
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[{label:'Total Revenue',value:`Rs. ${stats.revenue.toLocaleString()}`,color:'#15803d'},{label:'Transactions',value:stats.total,color:T.ink},{label:'Completed',value:stats.completed,color:T.blue},{label:'Pending',value:stats.pending,color:T.terra}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -83,14 +83,14 @@ export default function AdminPayments() {
           ))}
         </div>
 
-        <div style={s.tableWrap}>
+        <div style={{ ...s.tableWrap }}>
           {filtered.length===0 ? (
             <div style={{textAlign:'center',padding:'50px 20px',color:T.muted}}>
               <div style={{fontSize:36,opacity:0.3,marginBottom:12}}>◷</div>
               <p style={{fontWeight:600}}>No payments found.</p>
             </div>
           ) : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',minWidth:600}}>
               <thead><tr style={s.tableHead}>{['Transaction ID','Customer','For','Type','Amount','Method','Date','Status','Actions'].map(h=><th key={h} style={s.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map(p => {
@@ -125,7 +125,7 @@ export default function AdminPayments() {
             </table>
           )}
         </div>
-      </main>
+      </PageLayout>
     </div>
   )
 }
