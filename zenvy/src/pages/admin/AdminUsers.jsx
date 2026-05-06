@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, roleBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, roleBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard', icon:'◉', path:'/admin/dashboard' },
@@ -56,12 +56,12 @@ export default function AdminUsers() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${adminUser?.first_name||""} ${adminUser?.last_name||""}`} userRole="Super Admin" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>User Management</h1><p style={s.sub}>Manage all platform users — customers, providers, and admins</p>
         </div>
 
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[{label:'Total Users',value:stats.total,color:T.ink},{label:'Customers',value:stats.customers,color:T.blue},{label:'Providers',value:stats.providers,color:T.purple},{label:'Admins',value:stats.admins,color:T.terra}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -81,14 +81,14 @@ export default function AdminUsers() {
           ))}
         </div>
 
-        <div style={s.tableWrap}>
+        <div style={{ ...s.tableWrap }}>
           {filtered.length===0 ? (
             <div style={{textAlign:'center',padding:'50px 20px',color:T.muted}}>
               <div style={{fontSize:36,opacity:0.3,marginBottom:12}}>◈</div>
               <p style={{fontWeight:600}}>No users found.</p>
             </div>
           ) : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',minWidth:600}}>
               <thead><tr style={s.tableHead}>{['#','User','Email','Role','Joined','Actions'].map(h=><th key={h} style={s.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map((u,i) => {
@@ -115,7 +115,7 @@ export default function AdminUsers() {
             </table>
           )}
         </div>
-      </main>
+      </PageLayout>
     </div>
   )
 }
