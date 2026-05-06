@@ -201,7 +201,7 @@ export default function Sidebar({ items, userName, userRole, extra }) {
             <LogoMark size={36} />
             <div>
               <div style={{ fontFamily:"'Righteous',cursive", fontSize:20, color: T.sidebarHead, letterSpacing:3, lineHeight:1 }}>Zenvy</div>
-              <div style={{ fontSize:7.5, color: T.sidebarMuted, letterSpacing:3, textTransform:'uppercase', marginTop:2 }}>Milano, MCMLXXIV</div>
+              <div style={{ fontSize:7.5, color: T.sidebarMuted, letterSpacing:3, textTransform:'uppercase', marginTop:2 }}>A HomeService Platform</div>
             </div>
             {isMobile && (
               <button onClick={() => setOpen(false)} style={{ marginLeft:'auto', background:'none', border:'none', color: T.sidebarMuted, fontSize:20, cursor:'pointer', padding:4 }}>✕</button>
