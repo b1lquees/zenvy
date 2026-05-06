@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, paymentBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, paymentBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',      icon:'◉', path:'/customer/dashboard' },
@@ -68,7 +68,7 @@ export default function Payments() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||''} ${user?.last_name||''}`} userRole="Customer" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>Payments</h1><p style={s.sub}>View all transactions and make payments</p>
         </div>
@@ -140,7 +140,7 @@ export default function Payments() {
             </table>
           )}
         </div>
-      </main>
+      </PageLayout>
     </div>
   )
 }
