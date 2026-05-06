@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, bookingBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, bookingBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',      icon:'◉', path:'/customer/dashboard' },
@@ -90,7 +90,7 @@ export default function BundleOffers() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||''} ${user?.last_name||''}`} userRole="Customer" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>Bundle Offers</h1><p style={s.sub}>Book multiple services together at once</p></div>
           <button onClick={()=>setShowCreate(true)} style={s.btn}>+ Create Bundle</button>
@@ -146,7 +146,7 @@ export default function BundleOffers() {
             })}
           </div>
         )}
-      </main>
+      </PageLayout>
 
       {showCreate && (
         <div style={s.modal} onClick={e=>{if(e.target===e.currentTarget)setShowCreate(false)}}>
