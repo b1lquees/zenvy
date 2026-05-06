@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, bookingBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, bookingBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',        icon:'◉', path:'/provider/dashboard' },
@@ -56,7 +56,7 @@ export default function BundleTasks() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||""} ${user?.last_name||""}`} userRole="Service Provider" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <h1 style={s.h1}>Bundle Tasks</h1><p style={s.sub}>Bundle offers assigned to you by customers</p>
         </div>
@@ -127,7 +127,7 @@ export default function BundleTasks() {
             })}
           </div>
         )}
-      </main>
+      </PageLayout>
     </div>
   )
 }
