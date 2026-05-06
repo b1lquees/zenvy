@@ -67,6 +67,8 @@ export default function BrowseServices() {
   const [imgErrors, setImgErrors]               = useState({})
   const navigate = useNavigate()
 
+  const isMobile = useIsMobile()
+
   useEffect(() => { fetchData() }, [])
 
   const fetchData = async () => {
@@ -96,30 +98,32 @@ export default function BrowseServices() {
   if (loading) return <div style={s.loading}>Loading…</div>
 
   return (
-    <div style={s.page}>
+    <div style={{ ...s.page, paddingTop: isMobile ? 52 : 0 }}>
       <Sidebar items={NAV} userName={`${user?.first_name||''} ${user?.last_name||''}`} userRole="Customer" />
       <PageLayout>
 
         {/* Header */}
-        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
+        <div style={{ display:'flex', alignItems: isMobile ? 'flex-start' : 'flex-end', flexDirection: isMobile ? 'column' : 'row', justifyContent:'space-between', gap: isMobile ? 12 : 0, marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>Browse Services</h1><p style={s.sub}>Find and book the right service for your needs</p></div>
-          <button onClick={() => navigate('/customer/bundles')} style={s.btn}>📦 Create Bundle</button>
+          <button onClick={() => navigate('/customer/bundles')} style={{ ...s.btn, width: isMobile ? '100%' : 'auto' }}>📦 Create Bundle</button>
         </div>
 
         {/* Filters */}
-        <div style={{ display:'flex', gap:10, background:T.mixCard, border:`2px solid ${T.mixBorder}`, borderRadius:12, padding:'12px 16px', marginBottom:18, flexWrap:'wrap', alignItems:'center' }}>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍  Search services..." style={{ ...s.input, flex:1, minWidth:200 }} />
-          <select value={selectedCategory} onChange={e=>setSelectedCategory(e.target.value)} style={s.select}>
-            <option value="">All Categories</option>
-            {categories.map(c=><option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
-          </select>
-          <select value={selectedPrice} onChange={e=>setSelectedPrice(e.target.value)} style={s.select}>
-            <option value="">Any Price</option>
-            <option value="under2000">Under Rs. 2,000</option>
-            <option value="2000to5000">Rs. 2,000 – 5,000</option>
-            <option value="over5000">Over Rs. 5,000</option>
-          </select>
-          <button onClick={()=>{setSearch('');setSelectedCategory('');setSelectedPrice('')}} style={s.btnGhost}>Clear</button>
+        <div style={{ display:'flex', gap:10, background:T.mixCard, border:`2px solid ${T.mixBorder}`, borderRadius:12, padding:'12px 16px', marginBottom:18, flexDirection: isMobile ? 'column' : 'row', flexWrap:'wrap', alignItems: isMobile ? 'stretch' : 'center' }}>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="🔍  Search services..." style={{ ...s.input, flex:1, minWidth: isMobile ? 'unset' : 200, width: isMobile ? '100%' : 'auto' }} />
+          <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+            <select value={selectedCategory} onChange={e=>setSelectedCategory(e.target.value)} style={{ ...s.select, flex:1, minWidth:130 }}>
+              <option value="">All Categories</option>
+              {categories.map(c=><option key={c.category_id} value={c.category_name}>{c.category_name}</option>)}
+            </select>
+            <select value={selectedPrice} onChange={e=>setSelectedPrice(e.target.value)} style={{ ...s.select, flex:1, minWidth:130 }}>
+              <option value="">Any Price</option>
+              <option value="under2000">Under Rs. 2,000</option>
+              <option value="2000to5000">Rs. 2,000 – 5,000</option>
+              <option value="over5000">Over Rs. 5,000</option>
+            </select>
+            <button onClick={()=>{setSearch('');setSelectedCategory('');setSelectedPrice('')}} style={s.btnGhost}>Clear</button>
+          </div>
         </div>
 
         <div style={{ fontSize:11, color:T.muted, marginBottom:16, fontWeight:700, letterSpacing:1 }}>
@@ -133,7 +137,7 @@ export default function BrowseServices() {
             <p style={{ fontWeight:600 }}>No services found. Try a different search.</p>
           </div>
         ) : (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3,1fr)', gap:16 }}>
             {filtered.map(service => {
               const providers  = service.provider_service || []
               const avgRating  = providers.length > 0
