@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',      icon:'◉', path:'/customer/dashboard' },
@@ -98,7 +98,7 @@ export default function BrowseServices() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||''} ${user?.last_name||''}`} userRole="Customer" />
-      <main style={s.main}>
+      <PageLayout>
 
         {/* Header */}
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
@@ -196,7 +196,7 @@ export default function BrowseServices() {
             })}
           </div>
         )}
-      </main>
+      </PageLayout>
     </div>
   )
 }
