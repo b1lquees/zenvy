@@ -1,12 +1,6 @@
-/* ============================================================
-   ZENVY — Design System
-   Theme: Pastel Blue × Pastel Purple — 50/50 Balanced
-   Fonts: Cormorant Garamond (display) + Nunito (UI) + Righteous (logo)
-   ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Cormorant+Garamond:wght@400;500;600&family=Nunito:wght@400;600;700;800&display=swap');
 
-/* ── CSS Variables ── */
 :root {
   /* Purple scale */
   --purple:        #9b8ec4;
