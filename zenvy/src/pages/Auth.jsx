@@ -197,7 +197,7 @@ export default function Auth() {
           </div>
           <div>
             <div style={c.logoText}>Zenvy</div>
-            <div style={c.logoSub}>Milano, MCMLXXIV</div>
+            <div style={c.logoSub}></div>
           </div>
         </div>
 
