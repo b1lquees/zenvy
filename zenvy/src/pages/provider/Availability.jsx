@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',        icon:'◉', path:'/provider/dashboard' },
@@ -59,13 +59,13 @@ export default function Availability() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||""} ${user?.last_name||""}`} userRole="Service Provider" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>My Availability</h1><p style={s.sub}>Set your available time slots for customers to book</p></div>
           <button onClick={()=>setShowAdd(true)} style={s.btn}>+ Add Slot</button>
         </div>
 
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[{label:'Total Slots',value:counts.all,color:T.ink},{label:'Open Slots',value:counts.available,color:'#15803d'},{label:'Booked Slots',value:counts.booked,color:T.blue},{label:'Past Slots',value:counts.past,color:T.muted}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -88,7 +88,7 @@ export default function Availability() {
               <button onClick={()=>setShowAdd(true)} style={{...s.btn,marginTop:14}}>Add Slot</button>
             </div>
           ) : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',minWidth:550}}>
               <thead><tr style={s.tableHead}>{['#','Date','Start','End','Duration','Status','Action'].map(h=><th key={h} style={s.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map((slot,i) => {
@@ -119,7 +119,7 @@ export default function Availability() {
             </table>
           )}
         </div>
-      </main>
+      </PageLayout>
 
       {showAdd && (
         <div style={s.modal} onClick={e=>{if(e.target===e.currentTarget)setShowAdd(false)}}>
