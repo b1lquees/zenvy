@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',        icon:'◉', path:'/provider/dashboard' },
@@ -57,7 +57,7 @@ export default function MyServices() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||""} ${user?.last_name||""}`} userRole="Service Provider" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>My Services</h1><p style={s.sub}>Services you currently offer to customers</p></div>
           <button onClick={()=>setShowAdd(true)} style={s.btn}>+ Add Service</button>
@@ -97,7 +97,7 @@ export default function MyServices() {
             })}
           </div>
         )}
-      </main>
+      </PageLayout>
 
       {showAdd && (
         <div style={s.modal} onClick={e=>{if(e.target===e.currentTarget)setShowAdd(false)}}>
