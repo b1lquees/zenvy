@@ -106,8 +106,9 @@ export function useIsMobile(breakpoint = 768) {
 
 // ── PageLayout ───────────────────────────────────────────────────
 export function PageLayout({ children }) {
+  const isMobile = useIsMobile()
   return (
-    <main style={s.main}>
+    <main style={{ ...s.main, marginLeft: isMobile ? 0 : 220, padding: isMobile ? '16px' : '28px 32px' }}>
       {children}
     </main>
   )
@@ -153,51 +154,93 @@ export function LogoMark({ size = 36 }) {
 // ── Sidebar Component ────────────────────────────────────────────
 export default function Sidebar({ items, userName, userRole, extra }) {
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
+  const [open, setOpen] = useState(false)
   const logout = async () => { await supabase.auth.signOut(); navigate('/auth') }
 
+  // Mobile hamburger button
+  const hamburger = isMobile ? (
+    <button onClick={() => setOpen(o => !o)} style={{
+      position: 'fixed', top: 12, left: 12, zIndex: 200,
+      background: T.sidebar, border: `2px solid ${T.sidebarBorder}`,
+      borderRadius: 8, width: 38, height: 38, cursor: 'pointer',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'center', gap: 5, padding: 0,
+    }}>
+      {[0,1,2].map(i => (
+        <span key={i} style={{ width: 18, height: 2, background: T.sidebarHead, borderRadius: 2, display: 'block' }} />
+      ))}
+    </button>
+  ) : null
+
+  // Overlay for mobile
+  const overlay = isMobile && open ? (
+    <div onClick={() => setOpen(false)} style={{
+      position: 'fixed', inset: 0, background: 'rgba(20,28,60,0.5)',
+      zIndex: 99, backdropFilter: 'blur(2px)',
+    }} />
+  ) : null
+
+  const sidebarVisible = !isMobile || open
+
   return (
-    <aside style={{ width:220, background: T.sidebar, display:'flex', flexDirection:'column', position:'fixed', top:0, left:0, bottom:0, borderRight:`2.5px solid ${T.sidebarBorder}`, zIndex:100 }}>
+    <>
+      {hamburger}
+      {overlay}
+      {sidebarVisible && (
+        <aside style={{
+          width: 220, background: T.sidebar, display: 'flex', flexDirection: 'column',
+          position: 'fixed', top: 0, left: 0, bottom: 0,
+          borderRight: `2.5px solid ${T.sidebarBorder}`, zIndex: 100,
+          transform: (isMobile && !open) ? 'translateX(-100%)' : 'translateX(0)',
+          transition: 'transform 0.25s ease',
+        }}>
 
-      {/* Logo */}
-      <div style={{ padding:'20px 16px 14px', borderBottom:`2px solid ${T.sidebarBorder}`, display:'flex', alignItems:'center', gap:10 }}>
-        <LogoMark size={36} />
-        <div>
-          <div style={{ fontFamily:"'Righteous',cursive", fontSize:20, color: T.sidebarHead, letterSpacing:3, lineHeight:1 }}>Zenvy</div>
-          <div style={{ fontSize:7.5, color: T.sidebarMuted, letterSpacing:3, textTransform:'uppercase', marginTop:2 }}>Milano, MCMLXXIV</div>
-        </div>
-      </div>
-
-      {/* User */}
-      <div style={{ padding:'12px 16px', borderBottom:`2px solid ${T.sidebarBorder}`, display:'flex', alignItems:'center', gap:9 }}>
-        <div style={{ ...s.avatar(30), fontSize:11 }}>{userName?.charAt(0) || '?'}</div>
-        <div>
-          <div style={{ color: T.sidebarHead, fontSize:12, fontWeight:700 }}>{userName}</div>
-          <div style={{ color: T.sidebarMuted, fontSize:9, letterSpacing:2, textTransform:'uppercase' }}>{userRole}</div>
-          {extra}
-        </div>
-      </div>
-
-      {/* Nav */}
-      <nav style={{ flex:1, padding:'10px 0' }}>
-        {items.map(item => (
-          <div key={item.path} onClick={() => navigate(item.path)}
-            style={{ padding:'9px 16px', display:'flex', alignItems:'center', gap:10, fontSize:12, fontWeight:700, cursor:'pointer', borderRadius:'0 99px 99px 0', marginRight:12, marginBottom:2, letterSpacing:0.3, transition:'all 0.2s',
-              color:      item.active ? '#fff'          : T.sidebarText,
-              background: item.active ? T.grad          : 'transparent',
-              border:     item.active ? `1.5px solid rgba(255,255,255,0.15)` : '1.5px solid transparent',
-            }}>
-            <span style={{ fontSize:14, width:18, textAlign:'center' }}>{item.icon}</span>
-            {item.label}
+          {/* Logo */}
+          <div style={{ padding:'20px 16px 14px', borderBottom:`2px solid ${T.sidebarBorder}`, display:'flex', alignItems:'center', gap:10 }}>
+            <LogoMark size={36} />
+            <div>
+              <div style={{ fontFamily:"'Righteous',cursive", fontSize:20, color: T.sidebarHead, letterSpacing:3, lineHeight:1 }}>Zenvy</div>
+              <div style={{ fontSize:7.5, color: T.sidebarMuted, letterSpacing:3, textTransform:'uppercase', marginTop:2 }}>Milano, MCMLXXIV</div>
+            </div>
+            {isMobile && (
+              <button onClick={() => setOpen(false)} style={{ marginLeft:'auto', background:'none', border:'none', color: T.sidebarMuted, fontSize:20, cursor:'pointer', padding:4 }}>✕</button>
+            )}
           </div>
-        ))}
-      </nav>
 
-      {/* Logout */}
-      <div style={{ padding:'12px 16px', borderTop:`2px solid ${T.sidebarBorder}` }}>
-        <div onClick={logout} style={{ fontSize:11, color: T.terra, cursor:'pointer', fontWeight:700, letterSpacing:1, textTransform:'uppercase', transition:'letter-spacing 0.2s' }}>
-          ↪ Sign Out
-        </div>
-      </div>
-    </aside>
+          {/* User */}
+          <div style={{ padding:'12px 16px', borderBottom:`2px solid ${T.sidebarBorder}`, display:'flex', alignItems:'center', gap:9 }}>
+            <div style={{ ...s.avatar(30), fontSize:11 }}>{userName?.charAt(0) || '?'}</div>
+            <div>
+              <div style={{ color: T.sidebarHead, fontSize:12, fontWeight:700 }}>{userName}</div>
+              <div style={{ color: T.sidebarMuted, fontSize:9, letterSpacing:2, textTransform:'uppercase' }}>{userRole}</div>
+              {extra}
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav style={{ flex:1, padding:'10px 0' }}>
+            {items.map(item => (
+              <div key={item.path} onClick={() => { navigate(item.path); if (isMobile) setOpen(false) }}
+                style={{ padding:'9px 16px', display:'flex', alignItems:'center', gap:10, fontSize:12, fontWeight:700, cursor:'pointer', borderRadius:'0 99px 99px 0', marginRight:12, marginBottom:2, letterSpacing:0.3, transition:'all 0.2s',
+                  color:      item.active ? '#fff'          : T.sidebarText,
+                  background: item.active ? T.grad          : 'transparent',
+                  border:     item.active ? `1.5px solid rgba(255,255,255,0.15)` : '1.5px solid transparent',
+                }}>
+                <span style={{ fontSize:14, width:18, textAlign:'center' }}>{item.icon}</span>
+                {item.label}
+              </div>
+            ))}
+          </nav>
+
+          {/* Logout */}
+          <div style={{ padding:'12px 16px', borderTop:`2px solid ${T.sidebarBorder}` }}>
+            <div onClick={logout} style={{ fontSize:11, color: T.terra, cursor:'pointer', fontWeight:700, letterSpacing:1, textTransform:'uppercase', transition:'letter-spacing 0.2s' }}>
+              ↪ Sign Out
+            </div>
+          </div>
+        </aside>
+      )}
+    </>
   )
 }
