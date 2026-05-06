@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
@@ -91,6 +91,40 @@ export const s = {
   modalCard:{ background:'#fff', borderRadius:20, padding:28, boxShadow:'0 8px 40px rgba(80,100,180,0.18)', border:`2px solid ${T.mixBorder}` },
 
   avatar: (size=32) => ({ width:size, height:size, borderRadius:'50%', background:`linear-gradient(135deg,${T.blueLight},${T.purpleLight})`, border:`2px solid ${T.mixBorder}`, display:'flex', alignItems:'center', justifyContent:'center', color:'#2a3870', fontSize: size*0.3, fontWeight:800, flexShrink:0 }),
+}
+
+// ── useIsMobile hook ─────────────────────────────────────────────
+export function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < breakpoint)
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < breakpoint)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [breakpoint])
+  return isMobile
+}
+
+// ── PageLayout ───────────────────────────────────────────────────
+export function PageLayout({ children }) {
+  return (
+    <main style={s.main}>
+      {children}
+    </main>
+  )
+}
+
+// ── StatGrid ─────────────────────────────────────────────────────
+export function StatGrid({ stats = [], cols = 4 }) {
+  return (
+    <div style={{ ...s.statGrid, gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      {stats.map((stat, i) => (
+        <div key={i} style={s.statCard}>
+          <div style={s.statLabel}>{stat.label}</div>
+          <div style={{ ...s.statNum, color: stat.color || s.statNum.color }}>{stat.value}</div>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 // ── Animated Logo Mark ───────────────────────────────────────────
