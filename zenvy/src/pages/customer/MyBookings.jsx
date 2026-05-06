@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s, bookingBadge } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s, bookingBadge } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard',      icon:'◉', path:'/customer/dashboard' },
@@ -48,12 +48,12 @@ export default function MyBookings() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${user?.first_name||''} ${user?.last_name||''}`} userRole="Customer" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>My Bookings</h1><p style={s.sub}>Track and manage all your service bookings</p></div>
           <button onClick={() => navigate('/customer/browse')} style={s.btn}>+ New Booking</button>
         </div>
-        <div style={s.statGrid}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:12, marginBottom:22 }}>
           {[{label:'Total',value:counts.all,color:T.ink},{label:'Pending',value:counts.pending,color:T.terra},{label:'Active',value:counts.accepted+counts.in_progress,color:T.blue},{label:'Completed',value:counts.completed,color:'#15803d'}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -74,7 +74,7 @@ export default function MyBookings() {
               <button onClick={()=>navigate('/customer/browse')} style={{...s.btn,marginTop:14}}>Browse Services</button>
             </div>
           ) : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',minWidth:500}}>
               <thead><tr style={s.tableHead}>{['#','Service','Provider','Booked On','Service Date','Location','Price','Status','Actions'].map(h=><th key={h} style={s.th}>{h}</th>)}</tr></thead>
               <tbody>
                 {filtered.map((b,i) => {
@@ -104,7 +104,7 @@ export default function MyBookings() {
             </table>
           )}
         </div>
-      </main>
+      </PageLayout>
     </div>
   )
 }
