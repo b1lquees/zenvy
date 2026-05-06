@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabaseClient'
-import Sidebar, { T, s } from '../../components/Sidebar'
+import Sidebar, { PageLayout, StatGrid, useIsMobile, T, s } from '../../components/Sidebar'
 
 const NAV = [
   { label:'Dashboard', icon:'◉', path:'/admin/dashboard' },
@@ -64,13 +64,13 @@ export default function AdminServices() {
   return (
     <div style={s.page}>
       <Sidebar items={NAV} userName={`${adminUser?.first_name||""} ${adminUser?.last_name||""}`} userRole="Super Admin" />
-      <main style={s.main}>
+      <PageLayout>
         <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:22, paddingBottom:16, borderBottom:`2px solid ${T.mixBorder}` }}>
           <div><h1 style={s.h1}>Service Management</h1><p style={s.sub}>Manage all services available on the platform</p></div>
           <button onClick={()=>setShowAdd(true)} style={s.btn}>+ Add Service</button>
         </div>
 
-        <div style={{...s.statGrid,gridTemplateColumns:'repeat(3,1fr)'}}>
+        <div style={{...s.statGrid,gridTemplateColumns:'repeat(2,1fr)'}}>
           {[{label:'Total Services',value:services.length,color:T.ink},{label:'Categories',value:categories.length,color:T.blue},{label:'With Providers',value:services.filter(sv=>sv.provider_service?.length>0).length,color:T.purple}].map(st=>(
             <div key={st.label} style={s.statCard}><div style={s.statLabel}>{st.label}</div><div style={{...s.statNum,color:st.color}}>{st.value}</div></div>
           ))}
@@ -93,7 +93,7 @@ export default function AdminServices() {
             <p style={{fontWeight:600}}>No services found.</p>
           </div>
         ) : (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:16}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:16}}>
             {filtered.map(sv => (
               <div key={sv.service_id} style={{background:T.mixCard,border:`2px solid ${T.mixBorder}`,borderRadius:14,overflow:'hidden',boxShadow:'0 2px 8px rgba(80,100,180,0.08)'}}>
                 <div style={{height:80,background:`linear-gradient(135deg,${T.bluePale},${T.purplePale})`,borderBottom:`2px solid ${T.mixBorder}`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,opacity:0.4}}>◎</div>
@@ -111,7 +111,7 @@ export default function AdminServices() {
             ))}
           </div>
         )}
-      </main>
+      </PageLayout>
 
       {showAdd && (
         <div style={s.modal} onClick={e=>{if(e.target===e.currentTarget)setShowAdd(false)}}>
