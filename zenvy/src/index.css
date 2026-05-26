@@ -156,7 +156,7 @@ textarea, label, td, th, a, li {
 
 /* ── Sidebar ── */
 aside, .sidebar {
-  width: 220px;
+  width: 260px;
   background: var(--sidebar-bg) !important;
   border-right: 2.5px solid var(--sidebar-border) !important;
   display: flex;
@@ -699,6 +699,7 @@ main > div:nth-child(5) { animation: fadeInUp 0.4s 0.33s ease both; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+  /* sidebar handled by React component */
   aside, .sidebar { display: none !important; }
   main { margin-left: 0 !important; padding: 16px; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
