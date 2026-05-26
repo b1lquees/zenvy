@@ -54,7 +54,7 @@ export const s = {
   th:      {padding:'10px 14px',textAlign:'left',fontSize:8.5,textTransform:'uppercase',letterSpacing:2,color:T.muted,fontWeight:800,borderBottom:`2px solid ${T.mixPale}`,whiteSpace:'nowrap'},
   td:      {padding:'11px 14px',fontSize:13,color:T.ink,verticalAlign:'middle',fontWeight:600},
   tr:      {borderBottom:`1.5px solid ${T.mixPale}`},
-  badge:   b=>({background:b.bg,color:b.color,border:`1.5px solid ${b.border}`,padding:'3px 10px',borderRadius:5,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:0.8,display:'inline-block'}),
+  badge:   b=>({background:b.bg,color:b.color,border:`1.5px solid ${b.border}`,padding:'3px 10px',borderRadius:5,fontSize:9,fontWeight:700,textTransform:'uppercase',letterSpacing:0.8,display:'inline-block',whiteSpace:'nowrap'}),
   btn:     {padding:'9px 20px',background:T.grad,color:'#fff',border:'2px solid rgba(80,100,180,0.25)',borderRadius:7,cursor:'pointer',fontSize:13,fontWeight:800,fontFamily:"'Nunito',sans-serif",boxShadow:'0 2px 10px rgba(100,120,200,0.22)',transition:'all 0.2s'},
   btnGhost:{padding:'7px 14px',background:'transparent',border:`2px solid ${T.mixBorder}`,borderRadius:7,cursor:'pointer',fontSize:12,color:T.muted,fontWeight:700,fontFamily:"'Nunito',sans-serif"},
   btnSm:   (bg,col,bor)=>({padding:'5px 11px',background:bg,color:col,border:`1.5px solid ${bor}`,borderRadius:6,cursor:'pointer',fontSize:11,fontWeight:700,fontFamily:"'Nunito',sans-serif"}),
@@ -66,6 +66,8 @@ export const s = {
   modal:   {position:'fixed',inset:0,background:'rgba(20,28,60,0.50)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:2000,backdropFilter:'blur(4px)'},
   modalCard:{background:'#fff',borderRadius:20,padding:28,boxShadow:'0 8px 40px rgba(80,100,180,0.18)',border:`2px solid ${T.mixBorder}`,width:'92vw',maxWidth:480,maxHeight:'90vh',overflowY:'auto'},
   avatar:  (size=32)=>({width:size,height:size,borderRadius:'50%',background:`linear-gradient(135deg,${T.blueLight},${T.purpleLight})`,border:`2px solid ${T.mixBorder}`,display:'flex',alignItems:'center',justifyContent:'center',color:'#2a3870',fontSize:size*0.3,fontWeight:800,flexShrink:0}),
+  // Mobile table wrapper — always use this around any <table> on mobile
+  tableScroll: {overflowX:'auto',WebkitOverflowScrolling:'touch',width:'100%'},
 }
 
 // ── useIsMobile ───────────────────────────────────────────────────
@@ -80,19 +82,19 @@ export function useIsMobile(bp=768){
 }
 
 // ── PageLayout ────────────────────────────────────────────────────
-// On mobile: no left margin, padding-bottom leaves room for bottom nav
 export function PageLayout({children}){
   const isMobile=useIsMobile()
   return(
     <main style={{
       ...s.main,
       marginLeft:isMobile?0:260,
-      padding:isMobile?'16px 14px':'28px 32px',
-      paddingTop:isMobile?'16px':'28px',
-      paddingBottom:isMobile?'90px':'28px',
+      padding:isMobile?'16px 12px':'28px 32px',
+      paddingTop:isMobile?'60px':'28px',   // room for fixed top bar on mobile
+      paddingBottom:isMobile?'24px':'28px',
       minHeight:'100vh',
       width:isMobile?'100%':undefined,
       boxSizing:'border-box',
+      overflowX:'hidden',
     }}>
       {children}
     </main>
@@ -142,24 +144,10 @@ export function LogoMark({size=36}){
   )
 }
 
-// ── Sidebar (desktop) + BottomNav (mobile) ────────────────────────
-export default function Sidebar({items,userName,userRole}){
-  const navigate=useNavigate()
-  const location=useLocation()
-  const isMobile=useIsMobile()
-  const logout=async()=>{await supabase.auth.signOut();navigate('/auth')}
-
-  // Show max 5 items in bottom nav; always add a "More/Logout" last slot
-  const bottomItems = items.slice(0,4)
-  const currentPath = location.pathname
-
-  // ── Desktop sidebar ──────────────────────────────────────────
-  if(!isMobile) return(
-    <aside style={{
-      width:260,background:T.sidebar,display:'flex',flexDirection:'column',
-      position:'fixed',top:0,left:0,bottom:0,
-      borderRight:`2.5px solid ${T.sidebarBorder}`,zIndex:100,overflowY:'auto',
-    }}>
+// ── SidebarContent (shared between desktop + mobile drawer) ──────
+function SidebarContent({items,userName,userRole,onNavigate,onLogout,currentPath}){
+  return(
+    <>
       {/* Logo */}
       <div style={{padding:'20px 16px 14px',borderBottom:`2px solid ${T.sidebarBorder}`,display:'flex',alignItems:'center',gap:10,flexShrink:0}}>
         <LogoMark size={34}/>
@@ -181,7 +169,7 @@ export default function Sidebar({items,userName,userRole}){
         {items.map(item=>{
           const active=item.active||(item.path&&currentPath===item.path)
           return(
-            <div key={item.path} onClick={()=>navigate(item.path)} style={{
+            <div key={item.path} onClick={()=>onNavigate(item.path)} style={{
               padding:'11px 18px',display:'flex',alignItems:'center',gap:12,
               fontSize:13,fontWeight:700,cursor:'pointer',
               borderRadius:'0 99px 99px 0',marginRight:14,marginBottom:3,
@@ -189,6 +177,7 @@ export default function Sidebar({items,userName,userRole}){
               color:active?'#fff':T.sidebarText,
               background:active?T.grad:'transparent',
               border:active?'1.5px solid rgba(255,255,255,0.15)':'1.5px solid transparent',
+              WebkitTapHighlightColor:'transparent',
             }}>
               <span style={{fontSize:16,width:20,textAlign:'center',flexShrink:0}}>{item.icon}</span>
               <span>{item.label}</span>
@@ -198,64 +187,132 @@ export default function Sidebar({items,userName,userRole}){
       </nav>
       {/* Logout */}
       <div style={{padding:'14px 18px',borderTop:`2px solid ${T.sidebarBorder}`,flexShrink:0}}>
-        <div onClick={logout} style={{fontSize:11,color:T.terra,cursor:'pointer',fontWeight:700,letterSpacing:1,textTransform:'uppercase'}}>↪ Sign Out</div>
+        <div onClick={onLogout} style={{fontSize:11,color:T.terra,cursor:'pointer',fontWeight:700,letterSpacing:1,textTransform:'uppercase',WebkitTapHighlightColor:'transparent'}}>↪ Sign Out</div>
       </div>
+    </>
+  )
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────
+export default function Sidebar({items,userName,userRole}){
+  const navigate=useNavigate()
+  const location=useLocation()
+  const isMobile=useIsMobile()
+  const [drawerOpen,setDrawerOpen]=useState(false)
+  const currentPath=location.pathname
+
+  const logout=async()=>{await supabase.auth.signOut();navigate('/auth')}
+  const goTo=(path)=>{navigate(path);setDrawerOpen(false)}
+
+  // Close drawer on route change
+  useEffect(()=>{setDrawerOpen(false)},[location.pathname])
+
+  // Prevent body scroll when drawer open
+  useEffect(()=>{
+    if(isMobile){
+      document.body.style.overflow=drawerOpen?'hidden':''
+      return()=>{document.body.style.overflow=''}
+    }
+  },[drawerOpen,isMobile])
+
+  // ── Desktop sidebar ──────────────────────────────────────────
+  if(!isMobile) return(
+    <aside style={{
+      width:260,background:T.sidebar,display:'flex',flexDirection:'column',
+      position:'fixed',top:0,left:0,bottom:0,
+      borderRight:`2.5px solid ${T.sidebarBorder}`,zIndex:100,overflowY:'auto',
+    }}>
+      <SidebarContent
+        items={items} userName={userName} userRole={userRole}
+        onNavigate={goTo} onLogout={logout} currentPath={currentPath}
+      />
     </aside>
   )
 
-  // ── Mobile: bottom tab bar ───────────────────────────────────
-  // Show first 4 nav items + a logout tab
-  const mobileNav = [...bottomItems, {label:'Sign Out', icon:'↪', path:'__logout__'}]
-
+  // ── Mobile: hamburger top bar + slide-in drawer ───────────────
   return(
-    <nav style={{
-      position:'fixed',bottom:0,left:0,right:0,
-      height:64,
-      background:T.sidebar,
-      borderTop:`2px solid ${T.sidebarBorder}`,
-      display:'flex',alignItems:'center',
-      zIndex:1000,
-      boxShadow:'0 -4px 20px rgba(10,15,50,0.25)',
-    }}>
-      {mobileNav.map((item,idx)=>{
-        const active = item.path && item.path !== '__logout__' && currentPath === item.path
-        return(
-          <div
-            key={idx}
-            onClick={async()=>{
-              if(item.path==='__logout__'){await supabase.auth.signOut();navigate('/auth')}
-              else navigate(item.path)
-            }}
+    <>
+      {/* Fixed top bar */}
+      <div style={{
+        position:'fixed',top:0,left:0,right:0,height:52,
+        background:T.sidebar,
+        borderBottom:`2px solid ${T.sidebarBorder}`,
+        display:'flex',alignItems:'center',justifyContent:'space-between',
+        padding:'0 14px',
+        zIndex:500,
+        boxShadow:'0 2px 12px rgba(10,15,50,0.22)',
+      }}>
+        {/* Hamburger */}
+        <button
+          onClick={()=>setDrawerOpen(true)}
+          style={{
+            background:'none',border:'none',cursor:'pointer',padding:'6px 4px',
+            display:'flex',flexDirection:'column',gap:5,WebkitTapHighlightColor:'transparent',
+          }}
+          aria-label="Open menu"
+        >
+          <span style={{display:'block',width:22,height:2.5,background:T.sidebarHead,borderRadius:2}}/>
+          <span style={{display:'block',width:16,height:2.5,background:T.sidebarMuted,borderRadius:2}}/>
+          <span style={{display:'block',width:22,height:2.5,background:T.sidebarHead,borderRadius:2}}/>
+        </button>
+
+        {/* Logo in center */}
+        <div style={{display:'flex',alignItems:'center',gap:8}}>
+          <LogoMark size={26}/>
+          <span style={{fontFamily:"'Righteous',cursive",fontSize:18,color:T.sidebarHead,letterSpacing:3}}>Zenvy</span>
+        </div>
+
+        {/* Avatar */}
+        <div style={{...s.avatar(30),fontSize:11}}>{userName?.charAt(0)||'?'}</div>
+      </div>
+
+      {/* Backdrop */}
+      {drawerOpen && (
+        <div
+          onClick={()=>setDrawerOpen(false)}
+          style={{
+            position:'fixed',inset:0,
+            background:'rgba(10,15,50,0.55)',
+            zIndex:600,
+            backdropFilter:'blur(2px)',
+            WebkitBackdropFilter:'blur(2px)',
+          }}
+        />
+      )}
+
+      {/* Slide-in Drawer */}
+      <div style={{
+        position:'fixed',top:0,left:0,bottom:0,
+        width:260,
+        background:T.sidebar,
+        borderRight:`2.5px solid ${T.sidebarBorder}`,
+        zIndex:700,
+        display:'flex',flexDirection:'column',
+        transform:drawerOpen?'translateX(0)':'translateX(-100%)',
+        transition:'transform 0.28s cubic-bezier(0.4,0,0.2,1)',
+        overflowY:'auto',
+        boxShadow:drawerOpen?'4px 0 30px rgba(10,15,50,0.35)':'none',
+      }}>
+        {/* Close button inside drawer */}
+        <div style={{position:'absolute',top:10,right:10,zIndex:1}}>
+          <button
+            onClick={()=>setDrawerOpen(false)}
             style={{
-              flex:1,
-              display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',
-              gap:3,
-              height:'100%',
-              cursor:'pointer',
-              borderTop: active ? `3px solid ${T.blue}` : '3px solid transparent',
-              background: active ? 'rgba(106,170,208,0.10)' : 'transparent',
-              transition:'all 0.18s',
+              background:'rgba(255,255,255,0.08)',border:'none',cursor:'pointer',
+              width:30,height:30,borderRadius:'50%',
+              display:'flex',alignItems:'center',justifyContent:'center',
+              color:T.sidebarMuted,fontSize:16,fontWeight:700,
               WebkitTapHighlightColor:'transparent',
             }}
-          >
-            <span style={{
-              fontSize:18,
-              color: item.path==='__logout__' ? T.terra : active ? T.blue : T.sidebarMuted,
-              lineHeight:1,
-            }}>{item.icon}</span>
-            <span style={{
-              fontSize:9,
-              fontWeight:800,
-              letterSpacing:0.5,
-              textTransform:'uppercase',
-              color: item.path==='__logout__' ? T.terra : active ? T.blue : T.sidebarMuted,
-              maxWidth:56,
-              textAlign:'center',
-              lineHeight:1.2,
-            }}>{item.label}</span>
-          </div>
-        )
-      })}
-    </nav>
+            aria-label="Close menu"
+          >✕</button>
+        </div>
+
+        <SidebarContent
+          items={items} userName={userName} userRole={userRole}
+          onNavigate={goTo} onLogout={logout} currentPath={currentPath}
+        />
+      </div>
+    </>
   )
 }
