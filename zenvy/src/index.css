@@ -549,19 +549,22 @@ body::after {
 
 aside, main, nav, footer { position: relative; z-index: 1; }
 
-/* ══════════════════════════════════════
-   MOBILE  ≤ 768px
-   Sidebar hidden — React renders bottom tab nav
-   ══════════════════════════════════════ */
+
 @media (max-width: 768px) {
 
-  /* Kill desktop sidebar entirely */
+  /* Desktop sidebar hidden — React renders hamburger drawer */
   aside, .sidebar { display: none !important; }
 
+  /* Main content: no left margin, padding-top clears fixed top bar (52px) */
   main {
     margin-left: 0 !important;
     padding: 14px 12px !important;
-    padding-bottom: 80px !important;   /* clear the 64px bottom nav */
+    padding-top: 64px !important;
+    padding-bottom: 20px !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100vw !important;
   }
 
   /* 2-column stat grid */
@@ -573,13 +576,20 @@ aside, main, nav, footer { position: relative; z-index: 1; }
   .page-header h1, h1 { font-size: 22px !important; }
   .page-header { padding-bottom: 12px !important; margin-bottom: 14px !important; }
 
-  /* Tables: horizontal scroll */
-  .table-card { overflow: hidden; }
-  table { min-width: 420px; }
-  /* Wrap every table in a scrollable div in your JSX with style={{ overflowX:'auto', WebkitOverflowScrolling:'touch' }} */
+  /* Tables: force horizontal scroll — cards clip, inner scrolls */
+  .table-card { overflow: hidden !important; }
+  .table-scroll-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  table { min-width: 480px !important; width: max-content !important; }
 
-  thead th { padding: 8px 10px !important; font-size: 7px !important; }
+  thead th { padding: 8px 10px !important; font-size: 7px !important; white-space: nowrap !important; }
   tbody td  { padding: 9px 10px !important; font-size: 11px !important; }
+
+  /* Badge — never let it wrap or overflow */
+  .badge, [class*="badge"] { white-space: nowrap !important; }
 
   /* Cards */
   .card { padding: 12px 10px !important; }
@@ -587,22 +597,26 @@ aside, main, nav, footer { position: relative; z-index: 1; }
   /* Filter tabs */
   .filter-bar { overflow-x: auto; padding: 8px 12px; }
 
-  /* Modal: full-width bottom-sheet style */
+  /* Modal */
   .modal-card { width: 96vw !important; max-height: 88vh !important; border-radius: 16px !important; padding: 20px 16px !important; }
 
   /* Auth */
   .auth-page  { padding: 16px; align-items: flex-start; padding-top: 40px; }
   .auth-card  { padding: 24px 18px !important; border-radius: var(--radius-lg) !important; }
 
-  /* Inputs: comfortable tap targets */
+  /* Inputs */
   input, select, textarea { font-size: 14px !important; padding: 10px 12px; }
 
-  /* Hide pure-decorative desktop-only elements */
+  /* Hide desktop-only decorations */
   .desktop-only { display: none !important; }
+
+  /* Prevent any element from busting the screen edge */
+  * { max-width: 100%; }
+  img, video { max-width: 100% !important; height: auto !important; }
 }
 
 @media (max-width: 420px) {
-  main { padding: 12px 10px !important; padding-bottom: 80px !important; }
+  main { padding: 12px 10px !important; padding-top: 64px !important; padding-bottom: 20px !important; }
   .stat-grid { gap: 8px !important; }
   h1 { font-size: 20px !important; }
   .auth-card { padding: 20px 14px !important; }
