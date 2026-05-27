@@ -213,7 +213,7 @@ export default function Auth() {
         {tab === 'login' && (
           <form onSubmit={handleLogin}>
             <label style={c.label}>Email Address</label>
-            <input style={c.input} type="email" placeholder="john@example.com" required
+            <input style={c.input} type="email" placeholder="ali@example.com" required
               onFocus={focusInput} onBlur={blurInput}
               onChange={e => update('email', e.target.value)} />
             <label style={c.label}>Password</label>
@@ -238,20 +238,20 @@ export default function Auth() {
             <div style={c.grid}>
               <div>
                 <label style={c.label}>First Name</label>
-                <input style={c.input} placeholder="John" required
+                <input style={c.input} placeholder="Ali" required
                   onFocus={focusInput} onBlur={blurInput}
                   onChange={e => update('first_name', e.target.value)} />
               </div>
               <div>
                 <label style={c.label}>Last Name</label>
-                <input style={c.input} placeholder="Doe" required
+                <input style={c.input} placeholder="Ahmed" required
                   onFocus={focusInput} onBlur={blurInput}
                   onChange={e => update('last_name', e.target.value)} />
               </div>
             </div>
 
             <label style={c.label}>Email</label>
-            <input style={c.input} type="email" placeholder="john@example.com" required
+            <input style={c.input} type="email" placeholder="ali@example.com" required
               onFocus={focusInput} onBlur={blurInput}
               onChange={e => update('email', e.target.value)} />
 
